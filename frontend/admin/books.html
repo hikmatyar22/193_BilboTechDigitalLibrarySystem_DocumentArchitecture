@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eksplorasi Buku | BiblioTech System</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #0891b2; border-radius: 10px; }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 to-cyan-50 min-h-screen flex text-slate-800">
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="w-72 bg-white min-h-screen shadow-2xl flex flex-col border-r-4 border-cyan-500 sticky top-0 h-screen z-50">
+    <div class="p-6 bg-gradient-to-br from-cyan-600 to-cyan-500">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="bg-white p-2 rounded-xl shadow-xl">
+                <i data-lucide="book-open" class="text-cyan-600" size="28"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-black text-white leading-none">BIBLIO</h1>
+                <p class="text-sm font-bold text-cyan-100">SYSTEM</p>
+            </div>
+        </div>
+
+        <!-- Admin Card -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border-2 border-white/20">
+            <div class="flex items-center gap-3 mb-3">
+                <div id="userInitial"
+                     class="w-12 h-12 bg-gradient-to-br from-lime-400 to-lime-500 rounded-xl flex items-center justify-center font-black text-white text-xl">
+                    A
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p id="adminName" class="font-black text-white text-sm truncate">Admin</p>
+                    <p class="text-xs text-cyan-100 font-medium tracking-wider">Admin Panel</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
+                <div class="w-2 h-2 bg-lime-400 rounded-full animate-pulse"></div>
+                <span class="text-xs text-white font-bold uppercase tracking-widest">Status: Online</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-grow px-4 py-6 space-y-2">
+        <a href="dashboard.html"
+           class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-cyan-50 font-semibold text-slate-700">
+            <i data-lucide="layout-dashboard" size="20"></i>
+            Dashboard
+        </a>
+
+        <a href="books.html"
+           class="flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 text-white font-bold shadow-lg">
+            <i data-lucide="search" size="20"></i>
+            Cari Buku
+        </a>
+
+        <a href="users.html"
+           class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-cyan-50 font-semibold text-slate-700">
+            <i data-lucide="users" size="20"></i>
+            Kelola Users
+        </a>
+
+        <a href="loans.html"
+           class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-cyan-50 font-semibold text-slate-700">
+            <i data-lucide="file-text" size="20"></i>
+            Peminjaman
+        </a>
+    </nav>
+
+    <!-- Logout -->
+    <div class="p-4 border-t">
+        <button onclick="logout()"
+                class="w-full py-3 rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white font-bold flex items-center justify-center gap-2 shadow-lg">
+            <i data-lucide="log-out" size="18"></i>
+            Logout
+        </button>
+    </div>
+</aside>
+
+<!-- ================= MAIN ================= -->
+<div class="flex-1 flex flex-col">
+
+<header class="h-32 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white shadow-xl flex items-center justify-between px-10 border-b-4 border-lime-500">
+    <div>
+        <h2 class="text-4xl font-black uppercase">Eksplorasi Buku</h2>
+        <p class="text-lg text-cyan-100 font-semibold mt-1">Google Books API</p>
+    </div>
+    <div class="bg-white/20 px-6 py-3 rounded-2xl font-black text-sm text-right">
+        <span class="text-[10px] uppercase">Hasil</span>
+        <div class="text-2xl" id="countDisplay">0</div>
+    </div>
+</header>
+
+<main class="p-8">
+
+<!-- Search Section -->
+<div class="mb-10">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-black text-slate-800 tracking-tight">Pencarian Buku</h2>
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+            <i data-lucide="search" size="14"></i>
+            <span>Google Books API</span>
+            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+        </div>
+    </div>
+    
+    <div class="bg-white p-8 rounded-3xl shadow-xl border-2 border-slate-100">
+        <form id="searchForm" class="flex gap-4">
+            <div class="flex-1 relative">
+                <i data-lucide="search" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400" size="20"></i>
+                <input id="queryInput" required
+                       class="w-full border-2 rounded-xl px-4 py-3 focus:border-cyan-500 outline-none pl-12"
+                       placeholder="Cari judul, penulis, topik...">
+            </div>
+            <button type="submit" class="bg-cyan-600 text-white px-10 py-3 rounded-xl font-black uppercase text-xs">
+                Cari Buku
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Books Results -->
+<div class="bg-white rounded-3xl shadow-xl border-2 border-slate-100 overflow-hidden">
+    <div class="p-6 bg-slate-50/50 border-b border-slate-100">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i data-lucide="book-open" class="text-cyan-600"></i>
+                <h4 class="font-black text-cyan-900 uppercase tracking-widest text-xs">Hasil Pencarian</h4>
+            </div>
+            <div class="text-xs text-slate-500">
+                <span id="countDisplay">0</span> buku ditemukan
+            </div>
+        </div>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400">
+                <tr>
+                    <th class="px-8 py-5 text-left">Cover</th>
+                    <th class="px-8 py-5 text-left">Detail</th>
+                    <th class="px-8 py-5 text-left">Penerbit</th>
+                    <th class="px-8 py-5 text-right">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="bookTableBody" class="divide-y divide-slate-100">
+                <tr>
+                    <td colspan="4" class="px-8 py-16 text-center text-slate-400">
+                        <div class="flex flex-col items-center gap-3">
+                            <i data-lucide="search" class="text-slate-300" size="48"></i>
+                            <p class="text-slate-400 font-medium">Gunakan pencarian untuk menemukan buku</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</main>
+</div>
+
+<script>
+const token = localStorage.getItem('token');
+const API_URL = 'http://localhost:3000/api/books';
+
+if (!token) location.href = '../index.html';
+
+// decode token
+try {
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  adminName.innerText = payload.name || 'Administrator';
+  userInitial.innerText = (payload.name || 'A')[0];
+} catch {}
+
+searchForm.onsubmit = e => {
+  e.preventDefault();
+  fetchBooks(queryInput.value);
+};
+
+async function fetchBooks(q) {
+  bookTableBody.innerHTML = '<tr><td colspan="4" class="p-10 text-center">Loading...</td></tr>';
+  const res = await fetch(`${API_URL}/search?q=${encodeURIComponent(q)}&limit=10`);
+  const json = await res.json();
+
+  countDisplay.innerText = json.totalItems || 0;
+  render(json.data || []);
+}
+
+function render(data) {
+  bookTableBody.innerHTML = '';
+  if (!data.length) {
+    bookTableBody.innerHTML = '<tr><td colspan="4" class="p-10 text-center">Tidak ditemukan</td></tr>';
+    return;
+  }
+
+  data.forEach(b => {
+    bookTableBody.innerHTML += `
+      <tr class="hover:bg-cyan-50">
+        <td class="px-8 py-4"><img src="${b.thumbnail}" class="w-12 h-16"></td>
+        <td class="px-8 py-4 font-bold">${b.title}<br><span class="text-xs text-slate-400">${b.authors?.join(', ')}</span></td>
+        <td class="px-8 py-4">${b.publisher || '-'}</td>
+        <td class="px-8 py-4 text-right">
+          <a href="${b.infoLink}" target="_blank" class="text-cyan-600 font-bold text-xs">Detail</a>
+        </td>
+      </tr>`;
+  });
+}
+
+function logout() {
+  if (confirm('Keluar?')) {
+    localStorage.clear();
+    location.href = '../index.html';
+  }
+}
+
+lucide.createIcons();
+</script>
+
+</body>
+</html>

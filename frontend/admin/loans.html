@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Peminjaman | BiblioTech System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-cyan-50 min-h-screen flex text-slate-800">
+
+    <aside class="w-72 bg-white min-h-screen shadow-2xl flex flex-col border-r-4 border-cyan-500 sticky top-0 h-screen z-50">
+        <div class="p-6 bg-gradient-to-br from-cyan-600 to-cyan-500">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="bg-white p-2 rounded-xl shadow-xl">
+                    <i data-lucide="book-open" class="text-cyan-600" size="28"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black text-white tracking-tight leading-none">BIBLIO</h1>
+                    <p class="text-sm font-bold text-cyan-100">SYSTEM</p>
+                </div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border-2 border-white/20">
+                <div class="flex items-center gap-3 mb-3">
+                    <div id="userInitial" class="w-12 h-12 bg-gradient-to-br from-lime-400 to-lime-500 rounded-xl flex items-center justify-center shadow-lg font-black text-white text-xl uppercase">A</div>
+                    <div class="flex-1 min-w-0">
+                        <p id="adminName" class="font-black text-white text-sm truncate">Admin</p>
+                        <p class="text-xs text-cyan-100 font-medium tracking-wider">Admin Panel</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
+                    <div class="w-2 h-2 bg-lime-400 rounded-full animate-pulse shadow-lg"></div>
+                    <span class="text-xs text-white font-bold uppercase tracking-widest">Status: Online</span>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="flex-grow px-4 py-6 space-y-2">
+            <a href="dashboard.html" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-cyan-50 transition font-semibold text-slate-700 group">
+                <i data-lucide="layout-dashboard" size="20"></i>
+                <span>Dashboard</span>
+            </a>
+            <div class="h-px bg-slate-100 my-4"></div>
+            <a href="books.html" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-cyan-50 transition font-semibold text-slate-700 group">
+                <i data-lucide="search" size="20"></i>
+                <span>Cari Buku</span>
+            </a>
+            <a href="users.html" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-cyan-50 transition font-semibold text-slate-700 group">
+                <i data-lucide="users" size="20"></i>
+                <span>Kelola Users</span>
+            </a>
+            <div class="px-3 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 text-white font-bold shadow-lg flex items-center gap-3">
+                <i data-lucide="file-text" size="20"></i>
+                <span>Peminjaman</span>
+            </div>
+        </nav>
+
+        <div class="p-4 border-t-2 border-slate-50">
+            <button onclick="logout()" class="w-full py-3 rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white font-bold flex items-center justify-center gap-2 shadow-lg hover:brightness-110 transition-all">
+                <i data-lucide="log-out" size="18"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col">
+        <header class="h-32 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white shadow-xl flex items-center justify-between px-10 border-b-4 border-lime-500">
+            <div>
+                <h2 class="text-4xl font-black tracking-tight uppercase">Data Peminjaman</h2>
+                <p class="text-lg text-cyan-100 font-semibold mt-1">Pantau Sirkulasi Koleksi Buku</p>
+            </div>
+            <div class="bg-lime-500 px-6 py-3 rounded-full shadow-xl font-black text-sm flex items-center gap-2 uppercase tracking-tighter">
+                <i data-lucide="clipboard-list" size="16"></i>
+                <span id="loanCount">0</span> TRANSAKSI
+            </div>
+        </header>
+
+        <main class="p-8">
+            <div class="bg-white p-6 rounded-3xl shadow-lg border-2 border-slate-100 mb-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="filter" class="text-cyan-600" size="20"></i>
+                        <h3 class="font-black text-slate-800 uppercase tracking-wider text-xs">Filter Status</h3>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="filterLoans('all')" id="btnAll" class="filter-btn px-4 py-2 rounded-xl bg-cyan-500 text-white text-xs font-black">SEMUA</button>
+                        <button onclick="filterLoans('pending')" id="btnPending" class="filter-btn px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-black hover:bg-amber-100">PENDING</button>
+                        <button onclick="filterLoans('dipinjam')" id="btnDipinjam" class="filter-btn px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-black hover:bg-blue-100">DIPINJAM</button>
+                        <button onclick="filterLoans('dikembalikan')" id="btnDikembalikan" class="filter-btn px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-black hover:bg-lime-100">KEMBALI</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-xl border-2 border-slate-100 overflow-hidden">
+                <div class="p-6 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="database" class="text-cyan-600" size="18"></i>
+                        <h4 class="font-black text-cyan-900 uppercase tracking-widest text-xs">Riwayat Peminjaman Buku</h4>
+                    </div>
+                    <button onclick="fetchLoans()" class="text-[10px] font-black text-cyan-600 hover:underline flex items-center gap-2">
+                        <i data-lucide="refresh-cw" size="12"></i> REFRESH
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50">
+                                <th class="px-8 py-5">Peminjam</th>
+                                <th class="px-8 py-5">Buku</th>
+                                <th class="px-8 py-5">Tanggal Pinjam</th>
+                                <th class="px-8 py-5">Jatuh Tempo</th>
+                                <th class="px-8 py-5">Status</th>
+                                <th class="px-8 py-5 text-right">Aksi Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loanTableBody" class="divide-y divide-slate-100 text-sm">
+                            <tr><td colspan="6" class="px-8 py-10 text-center text-slate-400 italic">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const API_URL = 'http://localhost:3000/api/loans';
+        if (!token) window.location.href = '../index.html';
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            document.getElementById('adminName').innerText = payload.name || 'Administrator';
+            document.getElementById('userInitial').innerText = (payload.name || 'A').charAt(0).toUpperCase();
+        } catch (e) {}
+
+        let allLoans = [];
+
+        async function fetchLoans() {
+            try {
+                const res = await fetch(`${API_URL}/all`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const json = await res.json();
+                allLoans = json.data || [];
+                renderLoans(allLoans);
+            } catch (err) {
+                document.getElementById('loanTableBody').innerHTML = '<tr><td colspan="6" class="px-8 py-10 text-center text-red-500 font-bold">❌ Gagal memuat data</td></tr>';
+            }
+        }
+
+        function renderLoans(loans) {
+            const body = document.getElementById('loanTableBody');
+            document.getElementById('loanCount').innerText = loans.length;
+            body.innerHTML = '';
+            
+            if (loans.length === 0) {
+                body.innerHTML = '<tr><td colspan="6" class="px-8 py-16 text-center text-slate-400 italic">Tidak ada data ditemukan.</td></tr>';
+                return;
+            }
+            
+            loans.forEach(l => {
+                const status = l.status;
+                const dueDate = new Date(l.due_date);
+                const today = new Date();
+                const isOverdue = status === 'dipinjam' && dueDate < today;
+                
+                // Styling per status
+                const statusMap = {
+                    'pending': 'bg-amber-100 text-amber-700',
+                    'dipinjam': isOverdue ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700',
+                    'dikembalikan': 'bg-emerald-100 text-emerald-700'
+                };
+
+                // Generate Aksi Tombol
+                let actions = '';
+                if (status === 'pending') {
+                    actions = `
+                        <div class="flex gap-2 justify-end">
+                            <button onclick="approveLoan(${l.id})" class="bg-emerald-500 text-white p-2 rounded-lg hover:bg-emerald-600 shadow-sm transition-all" title="Approve">
+                                <i data-lucide="check" size="16"></i>
+                            </button>
+                            <button onclick="rejectLoan(${l.id})" class="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 shadow-sm transition-all" title="Reject">
+                                <i data-lucide="x" size="16"></i>
+                            </button>
+                        </div>
+                    `;
+                } else if (status === 'dipinjam') {
+                    actions = `
+                        <button onclick="returnBook(${l.id})" class="bg-white border-2 border-lime-500 text-lime-600 hover:bg-lime-500 hover:text-white px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 ml-auto">
+                            <i data-lucide="rotate-ccw" size="14"></i> Kembalikan
+                        </button>
+                    `;
+                } else {
+                    actions = `<span class="text-slate-300 italic text-xs">Transaksi Selesai</span>`;
+                }
+                
+                body.innerHTML += `
+                    <tr class="hover:bg-cyan-50/30 transition-all">
+                        <td class="px-8 py-6">
+                            <div class="font-black text-cyan-900">${l.user?.name || 'Unknown'}</div>
+                            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">${l.user?.email || '-'}</div>
+                        </td>
+                        <td class="px-8 py-6">
+                            <div class="font-bold text-slate-700">${l.book_title}</div>
+                            <div class="text-[10px] text-slate-400">${l.book_author || '-'}</div>
+                        </td>
+                        <td class="px-8 py-6 text-slate-500 font-medium">
+                            ${new Date(l.loan_date).toLocaleDateString('id-ID')}
+                        </td>
+                        <td class="px-8 py-6">
+                            <div class="font-bold ${isOverdue ? 'text-red-600' : 'text-slate-500'}">
+                                ${new Date(l.due_date).toLocaleDateString('id-ID')}
+                            </div>
+                            ${isOverdue ? '<div class="text-[9px] font-black text-red-600 uppercase animate-pulse">OVERDUE</div>' : ''}
+                        </td>
+                        <td class="px-8 py-6">
+                            <span class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase ${statusMap[status]}">
+                                ${status}
+                            </span>
+                        </td>
+                        <td class="px-8 py-6 text-right">
+                            ${actions}
+                        </td>
+                    </tr>`;
+            });
+            lucide.createIcons();
+        }
+
+        // AKSI: APPROVE (Pending -> Dipinjam)
+        async function approveLoan(id) {
+            if(!confirm('Setujui peminjaman buku ini?')) return;
+            try {
+                const res = await fetch(`${API_URL}/${id}/approve`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if(res.ok) { alert('✅ ' + data.message); fetchLoans(); }
+                else alert('❌ ' + data.message);
+            } catch (err) { alert('❌ Gagal menghubungi server'); }
+        }
+
+        // AKSI: REJECT (Hapus Pengajuan)
+        async function rejectLoan(id) {
+            const notes = prompt("Berikan alasan penolakan:");
+            if (notes === null) return;
+            if(!confirm('Tolak dan hapus pengajuan ini?')) return;
+            try {
+                const res = await fetch(`${API_URL}/${id}/reject`, {
+                    method: 'DELETE',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify({ notes })
+                });
+                if(res.ok) { alert('⚠️ Peminjaman berhasil ditolak'); fetchLoans(); }
+                else alert('❌ Gagal menolak peminjaman');
+            } catch (err) { alert('❌ Error sistem'); }
+        }
+
+        // AKSI: RETURN (Dipinjam -> Dikembalikan)
+        async function returnBook(id) {
+    if(!confirm('Proses pengembalian buku?')) return;
+    try {
+        const res = await fetch(`${API_URL}/${id}/return`, {
+            method: 'PATCH',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json' // Tambahkan ini
+            },
+            // Kirim body minimal objek kosong agar backend tidak error saat destructuring
+            body: JSON.stringify({ 
+                return_date: new Date().toISOString().split('T')[0] 
+            }) 
+        });
+        
+        const data = await res.json();
+        if(res.ok) { 
+            alert('✅ ' + data.message); 
+            fetchLoans(); 
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (err) { 
+        alert('❌ Error sistem: ' + err.message); 
+    }
+}
+        function filterLoans(status) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = 'filter-btn px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-black';
+            });
+            
+            const btnMap = { 'all': 'btnAll', 'pending': 'btnPending', 'dipinjam': 'btnDipinjam', 'dikembalikan': 'btnDikembalikan' };
+            const colorMap = { 'all': 'bg-cyan-500', 'pending': 'bg-amber-500', 'dipinjam': 'bg-blue-500', 'dikembalikan': 'bg-emerald-500' };
+            
+            document.getElementById(btnMap[status]).className = `filter-btn px-4 py-2 rounded-xl ${colorMap[status]} text-white text-xs font-black`;
+
+            const filtered = status === 'all' ? allLoans : allLoans.filter(l => l.status === status);
+            renderLoans(filtered);
+        }
+
+        function logout() { 
+            if(confirm('Yakin ingin logout?')) { localStorage.clear(); window.location.href = '../index.html'; }
+        }
+
+        lucide.createIcons();
+        fetchLoans();
+    </script>
+</body>
+</html>
