@@ -81,7 +81,7 @@
 
         <main class="p-8">
             <div class="bg-white p-6 rounded-3xl shadow-lg border-2 border-slate-100 mb-6">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-3">
                         <i data-lucide="filter" class="text-cyan-600" size="20"></i>
                         <h3 class="font-black text-slate-800 uppercase tracking-wider text-xs">Filter Status</h3>
@@ -92,6 +92,21 @@
                         <button onclick="filterLoans('dipinjam')" id="btnDipinjam" class="filter-btn px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-black hover:bg-blue-100">DIPINJAM</button>
                         <button onclick="filterLoans('dikembalikan')" id="btnDikembalikan" class="filter-btn px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-black hover:bg-lime-100">KEMBALI</button>
                     </div>
+                </div>
+                <div class="flex items-center gap-3 pt-4 border-t border-slate-100">
+                    <div class="flex items-center gap-2 flex-1">
+                        <i data-lucide="search" class="text-slate-400" size="18"></i>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="Cari berdasarkan nama buku atau nama peminjam..." 
+                            class="flex-1 px-4 py-2 border-2 border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-cyan-500 transition-all"
+                            onkeyup="searchLoans()"
+                        >
+                    </div>
+                    <button onclick="clearSearch()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-black hover:bg-slate-200 transition-all">
+                        <i data-lucide="x" size="14"></i> CLEAR
+                    </button>
                 </div>
             </div>
 
@@ -138,6 +153,8 @@
         } catch (e) {}
 
         let allLoans = [];
+        let currentFilter = 'all';
+        let currentSearch = '';
 
         async function fetchLoans() {
             try {
@@ -146,10 +163,41 @@
                 });
                 const json = await res.json();
                 allLoans = json.data || [];
-                renderLoans(allLoans);
+                applyFiltersAndSearch();
             } catch (err) {
                 document.getElementById('loanTableBody').innerHTML = '<tr><td colspan="6" class="px-8 py-10 text-center text-red-500 font-bold">❌ Gagal memuat data</td></tr>';
             }
+        }
+
+        function applyFiltersAndSearch() {
+            let filteredLoans = allLoans;
+            
+            // Apply status filter
+            if (currentFilter !== 'all') {
+                filteredLoans = filteredLoans.filter(l => l.status === currentFilter);
+            }
+            
+            // Apply search filter
+            if (currentSearch.trim() !== '') {
+                const searchTerm = currentSearch.toLowerCase();
+                filteredLoans = filteredLoans.filter(l => 
+                    l.book_title.toLowerCase().includes(searchTerm) ||
+                    (l.user?.name && l.user.name.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            renderLoans(filteredLoans);
+        }
+
+        function searchLoans() {
+            currentSearch = document.getElementById('searchInput').value;
+            applyFiltersAndSearch();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            currentSearch = '';
+            applyFiltersAndSearch();
         }
 
         function renderLoans(loans) {
@@ -291,6 +339,8 @@
     }
 }
         function filterLoans(status) {
+            currentFilter = status;
+            
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.className = 'filter-btn px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-black';
             });
@@ -300,8 +350,7 @@
             
             document.getElementById(btnMap[status]).className = `filter-btn px-4 py-2 rounded-xl ${colorMap[status]} text-white text-xs font-black`;
 
-            const filtered = status === 'all' ? allLoans : allLoans.filter(l => l.status === status);
-            renderLoans(filtered);
+            applyFiltersAndSearch();
         }
 
         function logout() { 
