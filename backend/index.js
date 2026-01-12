@@ -107,7 +107,7 @@ app.listen(PORT, async () => {
 
   try {
     const open = (await import('open')).default;
-    await open(`http://localhost:${PORT}/index.html`);
+    await open(`http://localhost:${PORT}/landing.html`);
   } catch {
     // Auto-open optional
   }
