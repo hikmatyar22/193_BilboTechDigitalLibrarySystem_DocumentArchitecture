@@ -1191,11 +1191,11 @@
 
         async function getTotalBooksCount() {
             try {
-                const res = await fetch(`${API_BASE}/books/search?q=`, {
+                const res = await fetch(`${API_BASE}/books/search?q=programming`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const result = await res.json();
-                return result.data ? result.data.length : 0;
+                return result.totalItems || 0;
             } catch (err) {
                 return 0;
             }
